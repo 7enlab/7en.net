@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZenCode CLI Pilot — Bring any model. Pay less. Trust what runs.</title>
+<meta name="description" content="ZenCode CLI is a free, MIT-licensed coding agent. We're inviting 3–5 development teams to use it on real work for two weeks and measure what it actually saves.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<!--
+  Analytics: none on this page by design.
+  No Google Analytics (anonymity requirement).
+  At deploy time, add the Cloudflare Web Analytics beacon here with the
+  real site token from the 7EN Cloudflare account:
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "REAL_TOKEN_HERE"}'></script>
+  Do not deploy with a placeholder token.
+-->
+<style>
+  :root {
+    --blue: #2563EB;
+    --blue-dark: #1D4ED8;
+    --ink: #0F172A;
+    --muted: #475569;
+    --faint: #64748B;
+    --line: #E2E8F0;
+    --bg: #FFFFFF;
+    --bg-soft: #F8FAFC;
+    --code-bg: #0F172A;
+    --code-ink: #E2E8F0;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header { border-bottom: 1px solid var(--line); }
+  .header-inner {
+    max-width: 880px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 700; font-size: 17px; }
+  .brand:hover { text-decoration: none; }
+  .brand svg { display: block; }
+  .brand span em { font-style: normal; color: var(--blue); }
+  .header-link { font-size: 14px; font-weight: 600; color: var(--muted); }
+  .header-link:hover { color: var(--ink); }
+
+  /* Hero */
+  .hero { padding: 72px 0 56px; text-align: left; }
+  .eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue);
+    background: #EFF6FF; border: 1px solid #BFDBFE;
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 44px; line-height: 1.12; letter-spacing: -0.02em;
+    font-weight: 800; max-width: 640px; margin-bottom: 20px;
+  }
+  .hero p.lede {
+    font-size: 19px; color: var(--muted); max-width: 640px; margin-bottom: 32px;
+  }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-block; font-size: 16px; font-weight: 650;
+    padding: 12px 22px; border-radius: 10px; border: 1px solid transparent;
+  }
+  .btn:hover { text-decoration: none; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-ghost { border-color: var(--line); color: var(--ink); background: #fff; }
+  .btn-ghost:hover { border-color: var(--faint); }
+  .hero-note { margin-top: 16px; font-size: 14px; color: var(--faint); }
+
+  /* Sections */
+  section { padding: 48px 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-size: 26px; line-height: 1.25; letter-spacing: -0.015em;
+    font-weight: 750; margin-bottom: 12px;
+  }
+  .section-intro { font-size: 17px; color: var(--muted); max-width: 640px; margin-bottom: 28px; }
+
+  /* Steps */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .step {
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--blue); color: #fff; font-size: 14px; font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .step h3 { font-size: 16px; margin-bottom: 6px; }
+  .step p { font-size: 15px; color: var(--muted); }
+  .step code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; background: #E2E8F0; padding: 1px 5px; border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Two-column lists */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card {
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 24px;
+  }
+  .card h3 { font-size: 17px; margin-bottom: 12px; }
+  .check-list { list-style: none; }
+  .check-list li {
+    font-size: 15px; color: var(--muted); padding-left: 28px;
+    position: relative; margin-bottom: 10px;
+  }
+  .check-list li::before {
+    content: "✓"; position: absolute; left: 0; top: 0;
+    color: var(--blue); font-weight: 700;
+  }
+  .check-list li strong { color: var(--ink); font-weight: 650; }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg); color: var(--code-ink);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px; line-height: 1.55;
+    padding: 18px 20px; border-radius: var(--radius);
+    overflow-x: auto; margin: 16px 0;
+  }
+  pre .comment { color: #7C8AA5; }
+  .code-caption { font-size: 14px; color: var(--faint); margin-bottom: 4px; }
+  .code-caption code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; background: #F1F5F9; padding: 1px 5px; border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Form */
+  form { display: grid; gap: 16px; max-width: 560px; }
+  label { font-size: 14px; font-weight: 650; display: block; margin-bottom: 6px; }
+  label .opt { font-weight: 400; color: var(--faint); }
+  input, select, textarea {
+    width: 100%; font: inherit; font-size: 15px; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; background: #fff;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue);
+  }
+  textarea { min-height: 88px; resize: vertical; }
+  .form-note { font-size: 14px; color: var(--faint); max-width: 560px; }
+  #form-status { font-size: 14px; color: var(--muted); min-height: 20px; }
+
+  /* FAQ */
+  .faq-item { border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item h3 { font-size: 16px; margin-bottom: 6px; }
+  .faq-item p { font-size: 15px; color: var(--muted); max-width: 640px; }
+  .faq-item code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; background: #F1F5F9; padding: 1px 5px; border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--line); padding: 32px 0 48px; }
+  footer .tagline { font-size: 15px; font-weight: 650; margin-bottom: 8px; }
+  footer p { font-size: 14px; color: var(--faint); }
+  footer nav { margin-top: 16px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 32px; }
+    .hero { padding: 48px 0 40px; }
+    .hero p.lede { font-size: 17px; }
+    .steps, .cols { grid-template-columns: 1fr; }
+    section { padding: 36px 0; }
+    /* Long commands/URLs must wrap on narrow screens, not clip. */
+    pre { white-space: pre-wrap; word-break: break-all; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="brand" href="https://7en.net/">
+      <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M14 16 H50 L20 48 H42 L54 34" fill="none" stroke="#2563EB" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Zen<em>Code</em></span>
+    </a>
+    <a class="header-link" href="https://github.com/7enlabs/zencode">GitHub ↗</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <span class="eyebrow">Pilot program · 3–5 teams · 2 weeks</span>
+    <h1>An open-source coding agent that runs any model on your own key.</h1>
+    <p class="lede">ZenCode CLI is a free, MIT-licensed coding agent. Bring any model. Pay less. Trust what runs. We&rsquo;re inviting 3–5 development teams to use it on real work for two weeks — and measure what it actually saves.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#apply">Apply for the pilot</a>
+      <a class="btn btn-ghost" href="https://github.com/7enlabs/zencode">View on GitHub</a>
+    </div>
+    <p class="hero-note">Free forever for the core. No card. No seat fees.</p>
+  </div>
+
+  <section id="pilot">
+    <h2>What the pilot is</h2>
+    <p class="section-intro">Two weeks, your repo, your real tasks. We don&rsquo;t run a demo for you — you run the tool, and we measure two numbers together.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <h3>Use it on real work</h3>
+        <p>Pick your own repo and tasks. Any language, any stack. Two weeks, inside your normal workflow.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <h3>Measure two numbers</h3>
+        <p>Hours you save, and your real token cost from <code>zen cost</code>. Nothing else is tracked.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <h3>Tell us what happened</h3>
+        <p>Send the numbers and a few lines of feedback at the end. That&rsquo;s the whole pilot.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What you get</h2>
+    <div class="cols">
+      <div class="card">
+        <h3>For your team</h3>
+        <ul class="check-list">
+          <li><strong>Free use</strong> — the core is MIT-licensed and free forever.</li>
+          <li><strong>Direct support</strong> — a direct line to the team building it, while you pilot.</li>
+          <li><strong>Case-study credit</strong> — your team named in the published case study, only if you agree.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What we ask</h3>
+        <ul class="check-list">
+          <li><strong>Install it</strong> — one command, a few minutes to build from source.</li>
+          <li><strong>Use it for real work</strong> — two weeks, on tasks you&rsquo;d do anyway.</li>
+          <li><strong>Share the numbers</strong> — your <code>zen cost</code> output and short feedback at the end.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Install it in one command</h2>
+    <p class="section-intro">Linux and macOS. The script clones the repo, builds <code>zen-cli</code> in release mode, and puts the binary in <code>~/.local/bin/zen</code>. No sudo needed. Inspect the script before running it if you want to.</p>
+    <pre>curl -fsSL https://raw.githubusercontent.com/7enlabs/zencode/main/install.sh | sh</pre>
+    <p class="code-caption">Windows (PowerShell) and full details: <a href="https://github.com/7enlabs/zencode/blob/main/INSTALL.md">INSTALL.md</a>. You&rsquo;ll need Git and a Rust toolchain (<code>cargo</code>) first — the build takes a few minutes.</p>
+  </section>
+
+  <section>
+    <h2>How we measure cost</h2>
+    <p class="section-intro">The CLI tracks its own usage. <code>zen cost</code> prints tokens used and what they cost, per model — including a line that says the session cost $0.00 when everything ran on free models.</p>
+    <p class="code-caption">Example output format:</p>
+    <pre><span class="comment">$ zen cost</span>
+Session cost: &lt;session-id&gt;
+  &lt;model&gt; (&lt;provider&gt;)
+    12,400 input · 3,100 output tokens · $0.42
+Totals: 12,400 input · 3,100 output · 15,500 tokens
+
+Total cost: $0.42</pre>
+    <p class="code-caption">Machine-readable too: <code>zen cost --json</code>. At the end of the pilot, paste the output — that&rsquo;s the cost number. Hours saved are your own estimate: note tasks where the CLI did the work, and roughly how long they would have taken by hand.</p>
+  </section>
+
+  <section>
+    <h2>Who can join</h2>
+    <ul class="check-list">
+      <li><strong>A dev team doing real work</strong> — any language, any stack, anywhere in the world.</li>
+      <li><strong>Your own repo</strong> to work in during the two weeks.</li>
+      <li><strong>Willing to share the two numbers</strong> — hours saved and token cost — at the end.</li>
+    </ul>
+  </section>
+
+  <section id="apply">
+    <h2>Apply for the pilot</h2>
+    <p class="section-intro">Five fields. We reply within a few days — pilot places are limited to 3–5 teams.</p>
+    <form id="pilot-form">
+      <div>
+        <label for="f-team">Team name</label>
+        <input id="f-team" name="team" type="text" required autocomplete="organization" placeholder="e.g. Acme Web Team">
+      </div>
+      <div>
+        <label for="f-size">Team size</label>
+        <select id="f-size" name="size" required>
+          <option value="" selected>Select…</option>
+          <option>1–3 developers</option>
+          <option>4–10 developers</option>
+          <option>11–30 developers</option>
+          <option>30+ developers</option>
+        </select>
+      </div>
+      <div>
+        <label for="f-stack">Main stack</label>
+        <input id="f-stack" name="stack" type="text" required placeholder="e.g. TypeScript + React, Rust, Python/Django">
+      </div>
+      <div>
+        <label for="f-repo">Repo URL <span class="opt">(optional)</span></label>
+        <input id="f-repo" name="repo" type="url" placeholder="https://github.com/your-team/your-repo">
+      </div>
+      <div>
+        <label for="f-email">Contact email</label>
+        <input id="f-email" name="email" type="email" required autocomplete="email" placeholder="you@yourteam.com">
+      </div>
+      <div>
+        <button class="btn btn-primary" type="submit">Send application</button>
+      </div>
+      <p id="form-status" role="status"></p>
+    </form>
+    <p class="form-note">This opens your email client with the application pre-filled — no account, no tracking, no data stored on this page. Or write to us directly at <a href="mailto:contact@7en.net">contact@7en.net</a>.</p>
+  </section>
+
+  <section>
+    <h2>FAQ</h2>
+    <div class="faq-item">
+      <h3>Is ZenCode CLI free?</h3>
+      <p>Yes. The core is MIT-licensed and free forever. There are no seat fees and no paywalled core features.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Where does my code and data go?</h3>
+      <p>Nowhere through us. You bring your own API key (BYOK) — the CLI talks to your model provider directly. We don&rsquo;t run a server in the middle, and we don&rsquo;t see your code.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Do I need a card?</h3>
+      <p>No. There is nothing to pay for in the pilot, and the core stays free after it.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What happens after the pilot?</h3>
+      <p>You keep using it. The pilot ends; the CLI stays free. If the numbers are useful, we may publish a case study — only with your permission, and only with the numbers you agree to share.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="tagline">ZenCode CLI — Bring any model. Pay less. Trust what runs.</p>
+    <p>Built by 7EN Labs. The core is open source under the MIT License.</p>
+    <nav>
+      <a href="https://github.com/7enlabs/zencode">GitHub</a>
+      <a href="https://github.com/7enlabs/zencode/blob/main/LICENSE">MIT License</a>
+      <a href="mailto:contact@7en.net">contact@7en.net</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Signup form: no backend, no tracking. Builds a mailto: with the
+  // application pre-filled and opens the visitor's own email client.
+  // Destination: contact@7en.net — VERIFY this mailbox exists before deploy.
+  var form = document.getElementById('pilot-form');
+  var status = document.getElementById('form-status');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = function (id) { return document.getElementById(id).value.trim(); };
+    var team = v('f-team'), size = v('f-size'), stack = v('f-stack'),
+        repo = v('f-repo'), email = v('f-email');
+    if (!team || !size || !stack || !email) {
+      status.textContent = 'Please fill in team name, team size, main stack, and contact email.';
+      return;
+    }
+    var subject = 'ZenCode CLI pilot application — ' + team;
+    var body = [
+      'Team name: ' + team,
+      'Team size: ' + size,
+      'Main stack: ' + stack,
+      'Repo URL: ' + (repo || '(not shared)'),
+      'Contact email: ' + email,
+      '',
+      'We would like to join the 2-week ZenCode CLI pilot.'
+    ].join('\n');
+    window.location.href = 'mailto:contact@7en.net'
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+    status.textContent = 'Opening your email client with the application pre-filled…';
+  });
+})();
+</script>
+
+</body>
+</html>
